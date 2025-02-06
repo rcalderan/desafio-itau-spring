@@ -26,7 +26,11 @@ public class Transaction {
 
     //check errors
     public boolean hasErrors(){
-        return value >= 0;
+        OffsetDateTime now = OffsetDateTime.now();
+        var sel = value < 0 || date.isAfter(now);
+
+        logger.info("Log hasErrors(): {}", sel);
+        return sel;
     }
 
     // toString()

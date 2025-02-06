@@ -1,7 +1,10 @@
 package com.rcalderan.desafio_itau_spring.controller;
 
 import com.rcalderan.desafio_itau_spring.model.Transaction;
+import com.rcalderan.desafio_itau_spring.repository.TransactionRepository;
+import com.rcalderan.desafio_itau_spring.service.TransactionService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,8 @@ import java.util.List;
 @RequestMapping("/transacao")
 public class TransactionController {
 
+    @Autowired
+    private TransactionService transactionService;
     /**
      * Regist a transaction
      * @param transaction
@@ -24,28 +29,20 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<Void> createTransaction(@RequestBody @Valid Transaction transaction){
         if (transaction.hasErrors()) {
-            // Se a transação não for aceita por qualquer motivo
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }else{
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
 
-        // Validar a transação
-//        if (transaction.isValid()) {
-//            // Se a transação for válida e registrada
-//            return new ResponseEntity<>(HttpStatus.CREATED);
-//        } else if (transaction.hasErrors()) {
-//            // Se a transação não for aceita por qualquer motivo
-//            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-//        } else {
-//            // Se a requisição não for compreendida (JSON inválido, por exemplo)
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
     }
 
     @DeleteMapping
     public ResponseEntity<List<Transaction>> deleteTransaction(){
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        List<Transaction> deleted = transactionService.deleteAll();
+        if(deleted!= null && !deleted.isEmpty()){
+            return new ResponseEntity<>(deleted, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.rcalderan.desafio_itau_spring.controller;
 
 import com.rcalderan.desafio_itau_spring.model.Transaction;
+import com.rcalderan.desafio_itau_spring.service.TransactionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,10 +9,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +25,9 @@ public class TransactionControllerTest {
     @Mock
     private Transaction transaction;
 
+    @Mock
+    private TransactionService transactionService;
+
     @Test
     public void testCreateTransactionUnprocessableEntity() {
         //when(transaction.isValid()).thenReturn(false);
@@ -36,7 +39,16 @@ public class TransactionControllerTest {
 
     @Test
     public void testCreateTransactionUnprocessableEntity_2() {
-        Transaction t = new Transaction(-1, OffsetDateTime.now());
+        transaction= new Transaction(-1, OffsetDateTime.now());
+        var response = transactionController.createTransaction(transaction);
+
+        //when(transaction.hasErrors()).thenReturn(true);
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+    }
+
+    @Test
+    public void testCreateTransactionUnprocessableEntity_date_Future() {
+        transaction = new Transaction(1, OffsetDateTime.now().plusDays(1));
         var response = transactionController.createTransaction(transaction);
 
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
@@ -44,7 +56,7 @@ public class TransactionControllerTest {
 
     @Test
     public void whenMissingField_thenReturns400() {
-        Transaction transaction = new Transaction(1111, null);
+        transaction = new Transaction(1111, null);
 
         try {
             transactionController.createTransaction(transaction);
@@ -56,7 +68,10 @@ public class TransactionControllerTest {
 
     @Test
     public void whenDeleteTransaction_thenReturns200() {
-        Transaction transaction = new Transaction(1111, OffsetDateTime.now());
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.add(new Transaction(1111,  OffsetDateTime.now() ));
+        transactions.add(new Transaction(222,  OffsetDateTime.now() ));
+        when(transactionService.deleteAll()).thenReturn(transactions);
 
         ResponseEntity<List<Transaction>> response = transactionController.deleteTransaction();
 
