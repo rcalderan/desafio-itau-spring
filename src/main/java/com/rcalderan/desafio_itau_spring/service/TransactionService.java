@@ -47,6 +47,12 @@ public class TransactionService {
     }
 
     public StatisticDTO statistic(int seconds){
-        return  new StatisticDTO(0,0,0,0,0);
+        OffsetDateTime lastSeconds = OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(seconds);
+        var transactions = repository.getAll();
+
+        DoubleSummaryStatistics statistics = transactions.stream()
+                .filter(t -> t.getDate().isAfter(lastSeconds))
+                .collect(Collectors.summarizingDouble(Transaction::getValue));
+        return new StatisticDTO(statistics.getCount(), statistics.getSum(), statistics.getAverage(),statistics.getMin(), statistics.getMax());
     }
 }

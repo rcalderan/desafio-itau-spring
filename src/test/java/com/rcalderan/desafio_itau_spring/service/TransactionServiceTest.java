@@ -48,5 +48,24 @@ public class TransactionServiceTest {
         when(transactionRepository.getAll()).thenReturn(transacoes);
         assertNotEquals(0, transactionService.statistic(60).getAvg());
     }
+
+    @Test
+    public void statistcNoTRansactions_zero_expected_test() {
+        List<Transaction> transacoes = List.of();
+        when(transactionRepository.getAll()).thenReturn(transacoes);
+        assertEquals(0, transactionService.statistic(60).getAvg());
+    }
+
+    @Test
+    public void statistcWithTRansactions_zero_expected_test() {
+        List<Transaction> transacoes = List.of(
+                new Transaction(100.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(100)),
+                new Transaction(200.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(90)),
+                new Transaction(50.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(1000)),
+                new Transaction(300.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(70))
+        );
+        when(transactionRepository.getAll()).thenReturn(transacoes);
+        assertEquals(0, transactionService.statistic(60).getAvg());
+    }
 }
 

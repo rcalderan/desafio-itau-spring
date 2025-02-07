@@ -6,13 +6,10 @@ import com.rcalderan.desafio_itau_spring.service.TransactionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -22,24 +19,22 @@ public class StatisticControllerTest {
     @InjectMocks
     private StatisticController statisticController;
 
+    @Mock
+    private TransactionService transactionService;
+
     @Test
     public void testCreateStatisticEntity_OK() {
-        var response = statisticController.getStatistic();
+        var response = statisticController.getLastMinStatistic();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
     public void testCreateStatisticResposneK() {
-
-        List<Transaction> transacoes = List.of(
-                new Transaction(100.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(30)),
-                new Transaction(200.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(50)),
-                new Transaction(50.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(90)),
-                new Transaction(150.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(10))
-        );
-        Double expectedAvg = 150.0;
-        ResponseEntity<StatisticDTO> response = statisticController.getStatistic();
-        assertEquals(expectedAvg, response.getBody());
+        StatisticDTO expected = new StatisticDTO(150,10,20,30, 40);
+        when(transactionService.statistic(60)).thenReturn(expected);
+        ResponseEntity<StatisticDTO> response = statisticController.getLastMinStatistic();
+        assertNotNull(response.getBody());
+        assertEquals(expected, response.getBody());
     }
 }
