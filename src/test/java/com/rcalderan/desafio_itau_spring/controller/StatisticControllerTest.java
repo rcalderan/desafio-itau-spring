@@ -37,4 +37,13 @@ public class StatisticControllerTest {
         assertNotNull(response.getBody());
         assertEquals(expected, response.getBody());
     }
+
+    @Test
+    public void testStatisticPerSecond_OK() {
+        StatisticDTO expected = new StatisticDTO(150,10,20,30, 40);
+        when(transactionService.statistic(10)).thenReturn(expected);
+        ResponseEntity<StatisticDTO> response = statisticController.getStatisticInSeconds(10);
+        assertNotNull(response.getBody());
+        assertEquals(expected, response.getBody());
+    }
 }

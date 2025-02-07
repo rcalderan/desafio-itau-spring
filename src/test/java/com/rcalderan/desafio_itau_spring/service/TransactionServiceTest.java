@@ -67,5 +67,19 @@ public class TransactionServiceTest {
         when(transactionRepository.getAll()).thenReturn(transacoes);
         assertEquals(0, transactionService.statistic(60).getAvg());
     }
+
+    @Test
+    public void statistcPerSecond_test() {
+        int seconds = 10;
+        Double expectedValue = 300.0;
+        List<Transaction> transacoes = List.of(
+                new Transaction(100.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(100)),
+                new Transaction(200.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(90)),
+                new Transaction(50.0, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(1000)),
+                new Transaction(expectedValue, OffsetDateTime.now(ZoneOffset.UTC).minusSeconds(9))
+        );
+        when(transactionRepository.getAll()).thenReturn(transacoes);
+        assertEquals(expectedValue, transactionService.statistic(seconds).getAvg());
+    }
 }
 

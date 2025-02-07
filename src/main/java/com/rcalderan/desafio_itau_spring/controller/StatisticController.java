@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +36,24 @@ public class StatisticController {
             return new ResponseEntity<>(service.statistic(TIME), HttpStatus.OK);
         } catch (Exception e) {
 
-            logger.error("Create trasaction error: {}", e.getMessage());
+            logger.error("Statistic error: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Get transaction statistics last N seconds")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Last N seconds statistics"),
+            @ApiResponse(responseCode = "500", description = "Internal error")
+    })
+    @GetMapping(value = "/{seconds}")
+    public ResponseEntity<StatisticDTO> getStatisticInSeconds(@PathVariable int seconds){
+        try{
+            logger.info("Get last {} seconds statistics:", seconds);
+            return new ResponseEntity<>(service.statistic(seconds), HttpStatus.OK);
+        } catch (Exception e) {
+
+            logger.error("Statistic per second error: {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
