@@ -1,5 +1,6 @@
 package com.rcalderan.desafio_itau_spring.service;
 
+import com.rcalderan.desafio_itau_spring.dto.StatisticDTO;
 import com.rcalderan.desafio_itau_spring.model.Transaction;
 import com.rcalderan.desafio_itau_spring.repository.TransactionRepository;
 import lombok.Data;
@@ -10,7 +11,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Service
@@ -38,5 +44,9 @@ public class TransactionService {
      */
     public List<Transaction> deleteAll(){
         return repository.deleteAll();
+    }
+
+    public StatisticDTO statistic(int seconds){
+        return  new StatisticDTO(0,0,0,0,0);
     }
 }
